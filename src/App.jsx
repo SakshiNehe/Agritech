@@ -1,73 +1,80 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "./context/LanguageContext";
-import VoiceAssistant from "./components/VoiceAssistant";
-import SignupVoiceChat from "./components/SignupVoiceChat";
-
-import { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
-
+// Layout Components
+import MainLayout from './components/layout/MainLayout';
 import Navbar from "./components/customer/Navbar";
 import Footer from "./components/customer/Footer";
-import Home from "./components/customer/Home";
-import About from "./components/customer/About";
-import Features from "./components/customer/Features";
-import Product from "./components/customer/Product";
-import ProductDashboard from "./components/customer/ProductDashboard"
-import Firm from "./components/customer/Firm";
-import Contact from "./components/customer/Contact";
-import BuyNow from "./components/customer/BuyNow";
-import Cart from "./components/customer/Cart";
-import Vedic from "./components/customer/Vedic";
-import Organic from "./components/customer/Organic";
-import SignInSelection from "./pages/SignInSelection";
-import FarmerLandingPage from "./components/FarmerLandingPage";
-import CustomerSignup from "./pages/CustomerSignUp";
-import CustomerSignin from "./pages/CustomerSignin";
-import FarmerDashboard from "./pages/farmerDashboard";
-import FarmerLogin from "./pages/FarmerLogin";
-import AddProduct from "./components/AddProduct";
 
+// Core Components
+import VoiceAssistant from "./components/VoiceAssistant";
 
+// Auth Pages
+import SignInSelection from "./pages/auth/SignInSelection";
+import FarmerLogin from "./pages/auth/FarmerLogin";
+import FarmerRegister from "./pages/auth/FarmerRegister";
+import CustomerLogin from "./pages/auth/CustomerLogin";
+import CustomerRegister from "./pages/auth/CustomerRegister";
+
+// Farmer Pages
+import Dashboard from "./pages/farmer/Dashboard";
+import Inventory from "./pages/farmer/Inventory";
+import AddProduct from "./pages/farmer/AddProduct";
+import Orders from "./pages/farmer/Orders";
+import Profile from "./pages/farmer/Profile";
+
+// Shop/Customer Pages
+import Home from "./pages/customer/Home";
+import Products from "./pages/customer/Products";
+import Cart from "./pages/customer/Cart";
+import CustomerProfile from "./pages/customer/CustomerProfile";
 
 const App = () => {
-  // Initialize AOS animation
   useEffect(() => {
     AOS.init({ duration: 1000 });
   }, []);
 
   return (
     <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/features" element={<Features />} />
-        <Route path="/product" element={<Product />} />
-        <Route path="/product-Dashboard" element={<ProductDashboard />} />
-        <Route path="/firm" element={<Firm />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/Organic" element={<Organic />} />
-        <Route path="/Vedic" element={<Vedic />} />
-        <Route path="/Buynow" element={<BuyNow />} />
-        <Route path="/Cart" element={<Cart />} />
-        <Route path="/signin-selection" element = {<SignInSelection/>}/>
-        <Route path="/customer-signup" element = {<CustomerSignup/>}/>
-        <Route path="/customer-signin" element = {<CustomerSignin/>}/>
-        <Route path="/farmer-signup" element={<SignupVoiceChat/>}/>
-        <Route path="farmer-Dashboard" element={<FarmerDashboard/>}/>
-        <Route path="/login" element={<FarmerLogin/>} />
-        <Route path="/farmer-landing-page" element = {<FarmerLandingPage/>}/>
-        <Route path="/add-product" element={<AddProduct/>}/>
-
-
-      </Routes>
-      <Footer />
+      <LanguageProvider>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Navigate to="/auth/signin" replace />} />
+          <Route path="/auth/signin" element={<SignInSelection />} />
+          
+          {/* Farmer Auth Routes */}
+          <Route path="/farmer/login" element={<FarmerLogin />} />
+          <Route path="/farmer/register" element={<FarmerRegister />} />
+          
+          {/* Customer Auth Routes */}
+          <Route path="/customer/login" element={<CustomerLogin />} />
+          <Route path="/customer/register" element={<CustomerRegister />} />
+          
+          {/* Farmer Protected Routes */}
+          <Route path="/farmer" element={<MainLayout isFarmer={true} />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="inventory" element={<Inventory />} />
+            <Route path="add-product" element={<AddProduct />} />
+            <Route path="orders" element={<Orders />} />
+            <Route path="profile" element={<Profile />} />
+          </Route>
+          
+          {/* Customer Protected Routes */}
+          <Route path="/shop" element={<MainLayout isFarmer={false} />}>
+            <Route index element={<Home />} />
+            <Route path="products" element={<Products />} />
+            <Route path="cart" element={<Cart />} />
+            <Route path="profile" element={<CustomerProfile />} />
+          </Route>
+          
+          {/* Catch all route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </LanguageProvider>
     </Router>
   );
 };
